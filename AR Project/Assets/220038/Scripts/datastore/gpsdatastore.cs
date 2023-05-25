@@ -108,7 +108,7 @@ public class gpsdatastore : MonoBehaviour
                     tmp_lo = (double)obj[longitude_name] * 10000;
                     Vector2 tmp_check = new Vector2((float)tmp_la, (float)tmp_lo);
                     if ((double)(tmp_this - tmp_check).magnitude <= max_viewarea)//もし周辺のコメントなら表示
-                        get_commentall.text += "<size=16>【" + obj[savegps_name].ToString() + "】</size>\n「" + obj[comment_name].ToString() + "」\n\n";
+                        get_commentall.text += "<size=16>【" + obj[savegps_name].ToString()+"】</size>\n「" + obj[comment_name].ToString() + "」\n\n";
                     i += 1;
                 }
                 if (get_commentall.text == "") get_commentall.text = "(周辺にはコメントがまだ無いようだ…)";
