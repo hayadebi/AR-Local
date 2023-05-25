@@ -23,11 +23,13 @@ public class gpsdatastore : MonoBehaviour
     private string tmp_savetext;//一時的な文字格納場所
     public GPSManager gps_manager;//シーン内のGPSManager格納
     public double max_viewarea = 1.0;
+    public GameObject comment_obj;
+    private GameObject instantiate_obj;
     // Start is called before the first frame update
     void Start()
     {
-        get_commentthis.text = "(この地に書き込みでコメントを残してみませんか？)";
-        FetchStage();
+        //get_commentthis.text = "(この地に書き込みでコメントを残してみませんか？)";
+        ;
     }
 
     public void ClickDataSet()
@@ -86,6 +88,12 @@ public class gpsdatastore : MonoBehaviour
         //検索件数を設定
         query.Limit = query_limit;
         int i = 1;
+
+        GameObject[] tmp_arobjs = GameObject.FindGameObjectsWithTag("arobj");
+        foreach (GameObject obj in tmp_arobjs)
+        {
+            Destroy(obj.gameObject);
+        }
         //データストアでの検索を行う
         query.FindAsync((List<NCMBObject> objList, NCMBException e) =>
         {
@@ -100,15 +108,17 @@ public class gpsdatastore : MonoBehaviour
                 double tmp_la = gps_manager.get_latitude *= 10000;
                 double tmp_lo = gps_manager.get_longitude *= 10000;
                 //Vectorに変換する際はfloatが必須なので、上記でdouble変数に*10000して値をなるべく崩さないようにする
-                Vector2 tmp_this = new Vector2((float)tmp_la, (float)tmp_lo);
+                Vector3 tmp_this = new Vector3((float)tmp_la,0, (float)tmp_lo);
                 //検索成功時の処理
                 foreach (NCMBObject obj in objList)
                 {
                     tmp_la = (double)obj[latitude_name] * 10000;
                     tmp_lo = (double)obj[longitude_name] * 10000;
-                    Vector2 tmp_check = new Vector2((float)tmp_la, (float)tmp_lo);
+                    Vector3 tmp_check = new Vector3((float)tmp_la,0, (float)tmp_lo);
                     if ((double)(tmp_this - tmp_check).magnitude <= max_viewarea)//もし周辺のコメントなら表示
-                        get_commentall.text += "<size=16>【" + obj[savegps_name].ToString()+"】</size>\n「" + obj[comment_name].ToString() + "」\n\n";
+                    {
+                        instantiate_obj = Instantiate(comment_obj, new Vector3((float)tmp_la / 10000, 0, (float)tmp_lo / 10000), transform.rotation);
+                    }
                     i += 1;
                 }
                 if (get_commentall.text == "") get_commentall.text = "(周辺にはコメントがまだ無いようだ…)";
